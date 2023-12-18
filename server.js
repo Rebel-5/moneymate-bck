@@ -7,6 +7,7 @@ require("./utils/db");
 const userRouter = require("./routes/userRoutes");
 const groupRouter = require("./routes/groupRoutes");
 const expenseRouter = require("./routes/expenseRoutes");
+const friendRouter = require("./routes/friendsRoutes");
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
@@ -25,9 +26,8 @@ app.use("/api", groupRouter);
 // Expense API
 app.use("/api/expenses", expenseRouter);
 
-app.get("/welcome", (req, res) => {
-  res.send("<h1>Welcome Ali Ahmed</h1>");
-});
+// Friends API
+app.use("/api", friendRouter);
 
 app.listen(port, () => {
   console.log(`Server is listening on port ${port}`);
