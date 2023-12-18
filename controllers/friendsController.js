@@ -4,10 +4,10 @@ const User = require("../models/userModel");
 async function addFriend(req, res) {
     try {
         const user = await User.findById(req.user_id);
-        const { friendEmail } = req.body;
+        const { friendEmail } = req.params;
         const friend = await User.findOne({ email: friendEmail }).select('email fullName');
         if (!friend) {
-            throw new Error('Friend not found');
+            res.status(400).json({ message: 'Friend not found' });
         }
         await User.updateOne(
             { email: user.email },
@@ -25,7 +25,7 @@ async function addFriend(req, res) {
 async function removeFriend(req, res) {
     try {
         const user = await User.findById(req.user_id);
-        const { friendEmail } = req.body;
+        const { friendEmail } = req.params;
         await User.updateOne(
             { email: user.email },
             { $pull: { friends: { email: friendEmail } } }
@@ -39,4 +39,20 @@ async function removeFriend(req, res) {
     }
 }
 
-module.exports = { addFriend, removeFriend };
+async function getAllFriends(req, res) {
+    try {
+        const _user = await User.findById(req.user_id);
+        const user = await User.findOne({ email: _user.email }).select('friends');
+        if (!user) {
+            res.status(400).json({ message: 'User not found' });
+        }
+        res.status(201).json({
+            friends: user.friends,
+          });
+    } catch (error) {
+        console.error(error.message);
+        res.status(400).json({ message: error.message });
+    }
+}
+
+module.exports = { addFriend, removeFriend, getAllFriends };
