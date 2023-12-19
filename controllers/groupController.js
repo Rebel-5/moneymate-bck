@@ -1,4 +1,5 @@
 const Groups = require("../models/groupModel");
+const Expenses = require("../models/expenseModel");
 const User = require("../models/userModel");
 
 async function getgroups(req, res) {
@@ -13,26 +14,37 @@ async function getgroups(req, res) {
 async function getAllGroups(req, res) {
   try {
     const user = await User.findById(req.user_id);
-    console.log(user.email);
-
-    // Find groups where the user is a member
     const groups = await Groups.find({ "members.email": user.email });
-
-    // Calculate total expense for the user "ali@gmail.com"
     let totalExpense = 0;
-    groups.forEach((group) => {
+    let groupExpense = {};
+    let num = 0;
+
+    for (const group of groups) {
+      let count = group.members.length
+      const all_expenses = await Expenses.find({ group: group._id });
+      groupExpense[num] = 0
+      for (const expense of all_expenses) {
+        if (expense.paidBy == user._id){
+          groupExpense[num] += expense.amount/count
+        }
+        else {
+          groupExpense[num] -= expense.amount/count
+        }
+      };
+      groupExpense[num] = Number(groupExpense[num].toFixed(2));
+      num++;
       const member = group.members.find(
         (member) => member.email === user.email
       );
       if (member) {
         totalExpense += member.amount;
       }
-    });
+    };
 
-    res.status(200).json({ message: "All Groups", totalExpense, groups });
+    res.status(200).json({ message: "All Groups", totalExpense, groups, groupExpense });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error fetching groups" });
+    res.status(500).json({ error: "Error fetching groups: ", error});
   }
 }
 

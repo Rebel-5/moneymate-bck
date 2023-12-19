@@ -11,14 +11,12 @@ const createExpense = async (req, res) => {
         message: "Attribute can not be null",
       });
     }
-    console.log(description, amount, paidBy, group)
     const newExpense = new Expense({ description, amount, paidBy, group });
     await newExpense.save();
     const user = await User.findById(paidBy);
     const _group = await Groups.findById(group);
     const borrow_amount = amount / _group.members.length
     const lent_amount = borrow_amount * (_group.members.length - 1)
-    console.log(_group)
     _group.members.forEach(member => {
       console.log(member.email)
       if (member.email !== user.email) {
