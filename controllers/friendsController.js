@@ -9,12 +9,14 @@ async function addFriend(req, res) {
         if (!friend) {
             res.status(400).json({ message: 'Friend not found' });
         }
+        const friendObject = { friends: { email: friend.email, name: friend.fullName } }
         await User.updateOne(
             { email: user.email },
-            { $addToSet: { friends: { email: friend.email, name: friend.fullName } } }
+            { $addToSet:  friendObject}
         );
         res.status(201).json({
             message: "Friend added successfully",
+            friend: friendObject
           });
     } catch (error) {
         console.error(error.message);
