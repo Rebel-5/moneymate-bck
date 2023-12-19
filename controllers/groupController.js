@@ -83,7 +83,7 @@ async function addMembers(req, res) {
     const groupInfo = await group.save();
     res.json({
       message: "User added to the group successfully",
-      group: groupInfo,
+      member: { email: email, name: newUser.fullName, amount: 0 },
     });
   } catch (error) {
     console.error("Error adding user to group:", error);
