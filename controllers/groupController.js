@@ -15,7 +15,7 @@ async function getAllGroups(req, res) {
   try {
     const user = await User.findById(req.user_id);
     const groups = await Groups.find({ "members.email": user.email });
-    let totalExpense = 0;
+    let totalExpense = 0.0;
     let groupExpense = {};
     let num = 0;
 
