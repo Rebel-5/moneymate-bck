@@ -34,25 +34,31 @@ const createExpense = async (req, res) => {
   }
 };
 
-const getExpensesForGroup = async (req, res) => {
+async function getExpensesForGroup(req, res) {
   try {
-    const group = await Groups.find({ "_id": req.params.groupId });
+    const group = await Groups.findOne({ "_id": req.params.groupId });
     if (group.length === 0){
       res.json({ message: 'Group not found' });
     }
-    console.log(group)
+    console.log(req.user_id)
+    const user = await User.findById(req.user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "User not found in the database" });
+    }
     let totalExpense = 0.0;
     let count = group.members.length
-    const user = await User.findById(req.user_id);
     const expenses = await Expense.find({ group: req.params.groupId });
     for (const expense of expenses) {
-      if (expense.paidBy == user._id){
+      if (expense.paidBy == req._user._id){
         totalExpense += expense.amount/count
       }
       else {
         totalExpense -= expense.amount/count
       }
     };
+    totalExpense = Number(totalExpense.toFixed(2))
     res.json({ message: "All Expenses", totalExpense, expenses });
   } catch (error) {
     res.status(500).json({ message: error.message });

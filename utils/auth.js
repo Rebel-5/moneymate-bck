@@ -3,7 +3,6 @@ const config = require('./config')
 const User = require("../models/userModel");
 
 function GenerateToken(id) {
-    console.log(config.tokenKey)
     const payload = {
       id: id,
     };
